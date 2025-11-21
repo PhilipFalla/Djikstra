@@ -1,9 +1,10 @@
 import osmnx as ox
 import networkx as nx
-from shapely.geometry import Polygon, Point
+import pickle
+from shapely.geometry import Polygon
 from geopy.distance import geodesic
 
-# Define POLYGON area
+# Definir polígono del área
 poly_coords = [
     (-90.48948993505584, 14.61677635838943),
     (-90.48985599150609, 14.611051119286799),
@@ -38,11 +39,11 @@ poly_coords = [
 
 polygon = Polygon(poly_coords)
 
-# ---------------------------------------------------------
-# 2. Load OSM graph
-# ---------------------------------------------------------
+
+
+# Descargar grafo OSM dentro del polígono
 ox.settings.use_cache = True
-ox.settings.log_console = True
+ox.settings.log_console = False
 
 G = ox.graph_from_polygon(polygon, network_type="drive")
 
@@ -51,7 +52,8 @@ print(f"Nodes: {len(G.nodes())}")
 print(f"Edges: {len(G.edges())}")
 
 
-# Define POI coordinates (lat, lon)
+
+# Agregar POIs al grafo (como nodos adicionales)
 pois = {
     "UFM": (14.603554, -90.489188),
     "Cayala": (14.606130, -90.489984),
@@ -65,68 +67,37 @@ pois = {
     "MetroBowlZ15": (14.6010, -90.4985)
 }
 
-# Add POIs to graph + connect them to nearest street node
 def add_poi_node(G, poi_name, lat, lon):
+    """Add a POI to the graph and connect it to nearest street node."""
     poi_id = f"POI_{poi_name}"
 
-    # Find closest OSM node
+    # Encontrar nodo más cercano de la calle
     nearest_node = ox.distance.nearest_nodes(G, lon, lat)
-    
-    # Add the node
+
+    # Crear nodo POI
     G.add_node(poi_id, y=lat, x=lon, type="poi")
 
-    # Distance in meters
-    d = geodesic((lat, lon), (G.nodes[nearest_node]['y'], G.nodes[nearest_node]['x'])).meters
+    # Distancia en metros
+    d = geodesic(
+        (lat, lon),
+        (G.nodes[nearest_node]['y'], G.nodes[nearest_node]['x'])
+    ).meters
 
-    # Add bidirectional edges (because it's a drive network)
+    # Crear aristas en ambas direcciones
     G.add_edge(poi_id, nearest_node, length=d)
     G.add_edge(nearest_node, poi_id, length=d)
 
-    print(f"✔ Added POI '{poi_name}' → connected to OSM node {nearest_node} at {int(d)} m")
+    print(f"✔ Added POI '{poi_name}' connected to {nearest_node} ({int(d)} m)")
 
-# Add all POIs
+# Insertar todos los POIs
 for name, (lat, lon) in pois.items():
     add_poi_node(G, name, lat, lon)
 
-print("\nAll POIs added successfully!")
-print("Total nodes now:", len(G.nodes()))
-print("Total edges now:", len(G.edges()))
+print("\nPOIs added!")
+print("Nodes:", len(G.nodes()))
+print("Edges:", len(G.edges()))
 
-import matplotlib.pyplot as plt
+with open("grafo.pkl", "wb") as f:
+    pickle.dump(G, f)
 
-# ---------------------------------------------------------
-# 3. Visualize the street graph + POIs
-# ---------------------------------------------------------
-
-# Get node positions for plotting
-pos = {node: (data['x'], data['y']) for node, data in G.nodes(data=True)}
-
-# Separate normal nodes and POI nodes
-normal_nodes = [n for n, d in G.nodes(data=True) if d.get("type") != "poi"]
-poi_nodes     = [n for n, d in G.nodes(data=True) if d.get("type") == "poi"]
-
-# Plot graph
-plt.figure(figsize=(12, 12))
-
-# Plot edges
-nx.draw_networkx_edges(G, pos, edge_color="gray", width=0.8, alpha=0.7)
-
-# Plot normal nodes
-nx.draw_networkx_nodes(G, pos, nodelist=normal_nodes,
-                       node_size=5, node_color="black", alpha=0.6)
-
-# Plot POI nodes
-nx.draw_networkx_nodes(G, pos, nodelist=poi_nodes,
-                       node_size=80, node_color="red", alpha=0.9)
-
-# Add POI labels
-nx.draw_networkx_labels(G, pos,
-                        labels={n: n.replace("POI_", "") for n in poi_nodes},
-                        font_size=9, font_color="red")
-
-plt.title("Street Network + POIs")
-plt.xlabel("Longitude")
-plt.ylabel("Latitude")
-plt.axis("equal")
-plt.tight_layout()
-plt.show()
+print("Graph object saved as 'grafo.pkl'")
