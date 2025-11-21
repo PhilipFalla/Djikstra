@@ -81,19 +81,18 @@ def apply_traffic_weights(G, hour):
 # =====================================================
 # GRAFICAR
 # =====================================================
-def draw_graph_with_path(G_local, path, outfile="static/ruta.png"):
-    # Asegurarnos que la carpeta static existe
-    os.makedirs(os.path.dirname(outfile), exist_ok=True)
+def draw_graph_with_path(G_local, path, filename="ruta.png"):
+    # Ensure static directory exists: <project>/Djikstra/gui/static
+    static_dir = os.path.join(app.root_path, "static")
+    os.makedirs(static_dir, exist_ok=True)
 
-    # Usamos la variable pos calculada arriba (x,y)
+    outfile = os.path.join(static_dir, filename)
+
     plt.figure(figsize=(10, 7))
-    # dibujar todo el grafo en gris
     nx.draw_networkx_edges(G_local, pos, edge_color="lightgray", width=0.5)
     nx.draw_networkx_nodes(G_local, pos, node_size=10, node_color="black", alpha=0.6)
 
-    # si path es None o vacío, guardamos la vista completa
     if path:
-        # convertir strings a nodos reales (en caso recibas "POI_X" ya están así)
         edges = list(zip(path, path[1:]))
         nx.draw_networkx_nodes(G_local, pos, nodelist=path, node_size=60, node_color="red")
         nx.draw_networkx_edges(G_local, pos, edgelist=edges, edge_color="red", width=2.5)
@@ -101,7 +100,7 @@ def draw_graph_with_path(G_local, path, outfile="static/ruta.png"):
     plt.axis("off")
     plt.tight_layout()
     plt.savefig(outfile, dpi=200)
-    plt.close()  # cerrar la figura para liberar memoria
+    plt.close()
 
 # =====================================================
 # FLASK APP
@@ -151,7 +150,7 @@ def index():
                 else:
                     raise ValueError("Modo no reconocido")
 
-                draw_graph_with_path(G2, path, outfile="gui/static/ruta.png")
+                draw_graph_with_path(G2, path, filename="ruta.png")
                 image_path = "ruta.png"
 
             except nx.NetworkXNoPath:
