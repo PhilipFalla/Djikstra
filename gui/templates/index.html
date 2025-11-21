@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculadora de rutas</title>
+</head>
+<body style="font-family: Arial; padding: 20px;">
+    <h1>Calculadora de rutas</h1>
+
+    <form method="POST">
+        <label>Punto A:</label>
+        <select name="A">
+            {% for p in POIS %}
+                <option value="{{ p }}">{{ p }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <label>Punto B:</label>
+        <select name="B">
+            {% for p in POIS %}
+                <option value="{{ p }}">{{ p }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <label>Punto C (opcional):</label>
+        <select name="C">
+            <option value="">-- Ninguno --</option>
+            {% for p in POIS %}
+                <option value="{{ p }}">{{ p }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <label>Hora (opcional):</label>
+        <input type="number" name="hour" min="0" max="23">
+        <br><br>
+
+        <!-- BOTONES -->
+        <button name="mode" value="AB">Ruta A → B</button>
+        <button name="mode" value="ACB">Ruta A → C → B</button>
+        <button name="mode" value="avoidC">Evitar C</button>
+        <button name="mode" value="traffic">Con tráfico</button>
+    </form>
+
+    {% if image_path %}
+        <h2>Resultado:</h2>
+        <img src="{{ url_for('static', filename=image_path) }}" width="700">
+    {% endif %}
+</body>
+</html>

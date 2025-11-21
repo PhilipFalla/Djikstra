@@ -55,15 +55,15 @@ print(f"Edges: {len(G.edges())}")
 
 # Agregar POIs al grafo (como nodos adicionales)
 pois = {
-    "UFM": (14.603554, -90.489188),
-    "Cayala": (14.606130, -90.489984),
-    "ParqueLasAmericas": (14.594133, -90.514833),
-    "PlazaDecimaZ14": (14.598799, -90.508603),
-    "FridaysZ10": (14.588306, -90.513110),
+    "UFM": (14.6070, -90.5054),
+    "Cayala": (14.6142, -90.4849),
+    "ParqueLasAmericas": (14.5891, -90.5193),
+    "PlazaDecimaZ14": (14.5841, -90.5144),
+    "FridaysZ10": (14.6008, -90.5137),
     "MercadoLaVilla": (14.590766, -90.519698),
     "MyHouse": (14.584265071692746, -90.5098467388304),
-    "TheSecretGardenZ9": (14.605342, -90.513807),
-    "PraderaZ10": (14.588566, -90.510002),
+    "TheSecretGardenZ9": (14.6235, -90.5158),
+    "PraderaZ10": (14.5797, -90.4952),
     "MetroBowlZ15": (14.6010, -90.4985)
 }
 
