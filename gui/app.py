@@ -4,18 +4,14 @@ import networkx as nx
 import pickle
 import matplotlib
 
-# ========= IMPORTANT: use non-GUI backend BEFORE importing pyplot =========
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
 
-# =====================================================
 # CARGAR GRAFO
-# =====================================================
 with open("grafo.pkl", "rb") as f:
     G = pickle.load(f)
 
-# Asegurarnos de que nodos tienen 'x' y 'y' (OSMnx suele usar estas etiquetas)
 # Construimos pos para NetworkX basado en x,y
 pos = {n: (data.get("x"), data.get("y")) for n, data in G.nodes(data=True)}
 
@@ -32,9 +28,7 @@ POIS = [
     "POI_MetroBowlZ15"
 ]
 
-# =====================================================
 # FUNCIONES DE RUTA
-# =====================================================
 def shortest_path_AB(G, A, B):
     return nx.shortest_path(G, A, B, weight="length")
 
@@ -78,9 +72,7 @@ def apply_traffic_weights(G, hour):
 
     return G2
 
-# =====================================================
 # GRAFICAR
-# =====================================================
 def draw_graph_with_path(G_local, path, filename="ruta.png"):
     # Ensure static directory exists: <project>/Djikstra/gui/static
     static_dir = os.path.join(app.root_path, "static")
@@ -102,9 +94,7 @@ def draw_graph_with_path(G_local, path, filename="ruta.png"):
     plt.savefig(outfile, dpi=200)
     plt.close()
 
-# =====================================================
-# FLASK APP
-# =====================================================
+# FLASK
 app = Flask(__name__, static_folder="static")
 
 @app.route("/", methods=["GET", "POST"])

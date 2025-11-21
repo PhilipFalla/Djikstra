@@ -58,9 +58,7 @@ def apply_traffic_weights(G, hour):
     return G2
 
 
-# ======================
 # MENU PARA EL USUARIO
-# ======================
 def choose_poi(prompt):
     print(f"\n{prompt}")
     for i, poi in enumerate(POIS):
